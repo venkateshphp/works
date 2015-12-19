@@ -1,0 +1,606 @@
+1)for add css
+-----------
+
+<link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
+
+2)for add images
+---------------
+
+<img src="<?php echo get_stylesheet_directory_uri(); ?>/images/ph_icon.png"/>
+
+or
+
+<img src="<?php echo bloginfo('template_url'); ?>/images/logo.png">
+
+3)for add navigation bar
+-------------------------
+
+<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu' ) ); ?>
+
+4)give the link in anchor tag
+-----------------------------
+
+<a href="?page_id=17">Irrigation</a>
+
+5)include the custom css
+
+<link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/newsletter.css" media="screen" />
+
+6)for add js file
+-----------------
+
+<script type="text/javascript" src="<?php bloginfo('template_url'); ?>/pathto/yourscript.js"></script>
+
+
+7)register the menu in function.php
+------------------------------------
+
+
+function register_my_menu() {
+  register_nav_menus(
+  array(
+      'menu1' => __( 'Home Menu' ),
+      'menu2' => __( 'small Menu' )
+    ));
+}
+add_action( 'init', 'register_my_menu' );
+
+
+8)use the navigation menu in header 
+------------------------------------
+
+<?php wp_nav_menu(array("theme_location"=>"menu1","container_id"=>"nav")); ?>
+
+
+
+9)show the posts  with category wise
+--------------------------------------
+
+
+
+<ul>
+<?php
+global $post;
+$args = array(
+	'posts_per_page'   => 5,
+	'offset'           => 0,
+	'category_name'         => 'uncategorized',
+	'orderby'          => 'post_date',
+	'order'            => 'DESC',
+	'include'          => '',
+	'exclude'          => '',
+	'meta_key'         => '',
+	'meta_value'       => '',
+	'post_type'        => 'post',
+	'post_mime_type'   => '',
+	'post_parent'      => '',
+	'post_status'      => 'publish',
+	'suppress_filters' => true ); 
+$myposts = get_posts( $args );
+foreach ( $myposts as $post ) : 
+  setup_postdata( $post ); ?>
+	<li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
+<?php endforeach;
+wp_reset_postdata(); ?>
+</ul>
+
+
+10) create custom post and taxonomies
+---------------------------------------	
+
+function codex_custom_init() {
+    $args = array(
+      'public' => true,
+      'label'  => 'Movie Reviews'
+    );
+    register_post_type( 'movie_reviews', $args );
+}
+add_action( 'init', 'codex_custom_init' );
+
+
+add_action( 'init', 'create_my_taxonomies', 0 );
+
+function create_my_taxonomies() {
+    register_taxonomy(
+        'movie_reviews_movie_genre',
+        'movie_reviews',
+        array(
+            'labels' => array(
+                'name' => 'Movie Genre',
+                'add_new_item' => 'Add New Movie Genre',
+                'new_item_name' => "New Movie Type Genre"
+            ),
+            'show_ui' => true,
+            'show_tagcloud' => false,
+            'hierarchical' => true
+        )
+    );
+}
+
+
+
+
+11)show the custom posts  with taxonomy wise
+---------------------------------------------
+<ul>
+	<?php
+					
+						$a=get_posts(array(
+    'post_type' => 'movie_reviews',
+    'tax_query' => array(
+        array(
+        'taxonomy' => 'movie_reviews_movie_genre',
+        'field' => 'term_id',
+        'terms' => 9)//taxonomy name id
+    ))
+);
+						foreach ( $a as $post ) : 
+					 ?>
+							<li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
+						<?php endforeach;
+					?>
+				
+</ul>
+
+
+
+12) get all category from post
+------------------------------
+
+	<ul>
+ <?php 
+ 
+ $args = array(
+ 
+  'orderby' => 'name',
+  'parent' => 0
+  );
+$categories = get_categories( $args );
+foreach ( $categories as $category ) {
+	echo '<a href="' . get_category_link( $category->term_id ) . '">' . $category->name . '</a><br/>';
+}
+  ?> 
+
+
+
+</ul>	
+
+
+13) display all taxonomy types
+------------------------------- 	
+
+<?php		
+	$terms = get_terms( 'movie_reviews_movie_genre', 'orderby=count&hide_empty=0' );
+$count = count($terms);
+if ( $count > 0 ){
+ echo "<ul>";
+ foreach ( $terms as $term ) {
+   echo "<li>" . $term->name . "</li>";
+
+ }
+ echo "</ul>";
+}
+?> 
+
+===================================
+
+
+
+
+
+						<?php
+					$terms = get_terms("movie_reviews_movie_genre");
+ if ( !empty( $terms ) && !is_wp_error( $terms ) ){
+     echo "<ul>";
+     foreach ( $terms as $term ) {
+       echo "<li>" . $term->name .$term->term_taxonomy_id. "</li>";
+        
+     }
+     echo "</ul>";
+ }
+					?>
+
+
+14) get attachement image using attacment id 
+---------------------------------------------
+
+
+the_attachment_link( $attachment_id, false );
+
+
+15)add social link 
+--------------------
+
+
+
+add_action( 'admin_init', 'theme_options_init' );
+add_action( 'admin_menu', 'theme_options_add_page' ); 
+
+function theme_options_init(){
+ register_setting( 'sample_options', 'sample_theme_options');
+	} 
+
+function theme_options_add_page() {
+ add_theme_page( __( 'Social links', 'sampletheme' ), __( 'Social links', 'sampletheme' ), 'edit_theme_options', 'social_links', 'theme_options_do_page' );
+} 
+function theme_options_do_page() 
+	{
+		
+		if ( $_POST['update_themeoptions'] == 'true' ) { themeoptions_update(); }
+?>	
+	<div class="wrap">
+	<div id="social_options">
+		<h2>Social Icon Links</h2>
+		<form method="post" action="" name="social_form" id="social_form" >
+			<input type="hidden" name="update_themeoptions" value="true" />
+			<label>Facebook URL</label><br />
+			<input type="text" name="facebook_url" size="40" id="fb" value="<?php echo get_option('facebook_url'); ?>"/><br />
+			<label>Twitter URL</label><br />
+			<input type="text" name="twitter_url" size="40" id="tw"  value="<?php echo get_option('twitter_url'); ?>"/><br />
+			<label>LinkedIn URL</label><br />
+			<input type="text" name="linked_url" size="40" id="in"  value="<?php echo get_option('linked_url'); ?>"/><br />
+			<label>Plannen URL</label><br />
+			<input type="text" name="plannen_url" size="40" id="pl"  value="<?php echo get_option('plannen_url'); ?>"/><br />
+			<input id="btn" type="submit" value="Save" name="req_submit" />	
+
+		</form>
+	</div>
+</div>
+	<style>
+	#social_options{
+		width: 50%;
+		}
+	#social_options label {
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0 0 12px;
+	}
+	#social_options input {
+    margin: 0 0 25px;
+	}
+	#social_options form {
+    margin-left: 25px;
+	margin-top:35px;
+	}	
+	#social_options #btn {
+    cursor: pointer;
+    width: 100px;
+	}
+	</style>	
+<?php 
+}
+ function themeoptions_update()
+ 	{ 
+	update_option('facebook_url',$_POST['facebook_url']);	
+	update_option('twitter_url', $_POST['twitter_url']);
+	update_option('linked_url', $_POST['linked_url']);
+	update_option('plannen_url', $_POST['plannen_url']);
+	
+	}
+
+
+
+
+16)add meta boxes in custom post
+----------------------------------
+
+
+add_action( 'add_meta_boxes', 'tenant_add_custom_box' );
+add_action( 'save_post', 'tenant_save_postdata' );
+
+function tenant_add_custom_box() {
+   add_meta_box('',__( 'Position', 'tenant_textdomain' ), 'tenant_inner_custom_box', 'movie_reviews' , 'side' , 'high');
+}
+
+function tenant_inner_custom_box( $post ) {
+  wp_nonce_field( plugin_basename( __FILE__ ), 'myplugin_noncename' );
+
+  $url = get_post_meta( $post->ID, 'tenant_url', true );
+/*  $url1 = get_post_meta( $post->ID, 'tenant_image', true );*/
+  echo '<label for="myplugin_new_field">';
+       _e("Director Name : ", 'tenant_textdomain' );
+  echo '</label> ';
+  echo '<input type="text" id="tenant_url" name="tenant_url" value="'.esc_attr($url).'" size="27" /><br/>';
+  echo '<br/>';
+ /* echo '<label for="myplugin_new_field">';
+       _e("Image Name : ", 'tenant_textdomain' );
+  echo '</label> ';
+  echo '<input type="text" id="tenant_image" name="tenant_image" value="'.esc_attr($url1).'" size="27" /><br/>';
+  echo '<br/>';*/
+ }
+ /* When the post is saved, saves our custom data */
+function tenant_save_postdata( $post_id ) {
+
+  if ( 'page' == $_REQUEST['post_type'] ) {
+    if ( ! current_user_can( 'edit_page', $post_id ) )
+        return;
+  } else {
+    if ( ! current_user_can( 'edit_post', $post_id ) )
+        return;
+  }
+
+  // Secondly we need to check if the user intended to change this value.
+  if ( ! isset( $_POST['myplugin_noncename'] ) || ! wp_verify_nonce( $_POST['myplugin_noncename'], plugin_basename( __FILE__ ) ) )
+      return;
+
+  $post_ID = $_POST['post_ID'];
+  $url = sanitize_text_field( $_POST['tenant_url'] );
+ /*   $url1 = sanitize_text_field( $_POST['tenant_image'] );*/
+  add_post_meta($post_ID, 'tenant_url', $url, true) or update_post_meta($post_ID, 'tenant_url', $url);
+ /* add_post_meta($post_ID, 'tenant_image', $url1, true) or update_post_meta($post_ID, 'tenant_image', $url1);*/
+ }
+
+
+
+
+
+17)get attachment(image) link url using attachment Id
+--------------------------------------------------------
+
+
+<?php echo get_attached_file( $attachment_id, false ); ?>
+
+
+18)check whether attachment is an image using attachment id
+----------------------------------------------------------------
+
+
+if ( wp_attachment_is_image( $attachment_id ) ) {
+    echo "Post ".$attachment_id ." is an image!";
+  } else {
+    echo "Post ".$attachment_id ." is not an image.";
+  }
+
+
+18) get meta box value using post id
+---------------------------------------
+
+
+<?php echo $url = get_post_meta( '$post_id', 'tenant_url', true ); ?>
+
+19) delete the attachment image using attachment(image) id 
+------------------------------------------------------
+
+<?php wp_delete_attachment( '$attachment_id'); ?>
+
+20)get attachment file path using the attachment id
+---------------------------------------------------
+
+ <?php echo get_attached_file( '$attachment_id', false ); ?>
+
+21)display the attachment image using attachment id
+-----------------------------------------------------
+
+ <?php echo wp_get_attachment_image('$attachment_id');?>
+
+22) display the current user info
+---------------------------------
+
+<?php
+    $current_user = wp_get_current_user();
+    /**
+     * @example Safe usage: $current_user = wp_get_current_user();
+     * if ( !($current_user instanceof WP_User) )
+     *     return;
+     */
+    echo 'Username: ' . $current_user->user_login . '<br />';
+    echo 'User email: ' . $current_user->user_email . '<br />';
+    echo 'User first name: ' . $current_user->user_firstname . '<br />';
+    echo 'User last name: ' . $current_user->user_lastname . '<br />';
+    echo 'User display name: ' . $current_user->display_name . '<br />';
+    echo 'User ID: ' . $current_user->ID . '<br />';
+?>
+
+23)get one post under two taxonomies 
+---------------------------------------
+
+
+<?php
+ 
+$args = array(
+	'post_type' => 'careers',
+	'tax_query' => array(
+		'relation' => 'AND',
+		array(
+			'taxonomy' => 'careers_category',
+			'field'    => 'name',
+			'terms'    => 'Courses'
+		),
+		array(
+			'taxonomy' => 'career_inner',
+			'field'    => 'name',
+			'terms'    => 'ICT'
+		)
+	)
+);
+ $posts = get_posts( $args );
+?>
+
+24) add palce holder in contact form 7
+-----------------------------------------
+
+[text your-name placeholder "Your name here"]
+
+25) for add favicon
+-----------------
+
+<link rel="Shortcut Icon" href="<?php echo bloginfo('template_url'); ?>/assets/images/favicon.png" type="image/x-icon" />
+
+26) resize the image for required height and width
+--------------------------------------------------
+put below code in function.php
+
+
+if ( function_exists( 'add_image_size' ) ) { 
+ add_image_size( 'product_page_list', 228, 150, true ); //(cropped)
+ add_image_size( 'product_page_single', 379, 373, true ); //(cropped)
+ add_image_size( 'new_product_page', 250, 250, true ); //(cropped)
+// add_image_size( 'news_page', 329, 181, true ); //(cropped)
+ 
+}
+
+call that function 
+----------------------
+
+$url = wp_get_attachment_image_src( get_post_thumbnail_id($all_product->ID), 'new_product_page');
+
+<img src="<?php echo $url[0];?>">
+
+
+
+25)add editer in backend
+--------------------------
+
+ /*  editer */
+define('WYSIWYG_META_BOX_ID', 'my-editor');
+define('WYSIWYG_EDITOR_ID', 'myeditor'); //Important for CSS that this is different
+define('WYSIWYG_META_KEY', 'testimonial');
+
+add_action('admin_init', 'wysiwyg_register_meta_box');
+function wysiwyg_register_meta_box(){
+        add_meta_box(WYSIWYG_META_BOX_ID, __('Testimonial Box', 'wysiwyg'), 'wysiwyg_render_meta_box', 'portfolio');
+}
+
+function wysiwyg_render_meta_box(){
+ 
+        global $post;
+        
+        $meta_box_id = WYSIWYG_META_BOX_ID;
+        $editor_id = WYSIWYG_EDITOR_ID;
+        
+        //Add CSS & jQuery goodness to make this work like the original WYSIWYG
+        echo "
+                <style type='text/css'>
+                        #$meta_box_id #edButtonHTML, #$meta_box_id #edButtonPreview {background-color: #F1F1F1; border-color: #DFDFDF #DFDFDF #CCC; color: #999;}
+                        #$editor_id{width:100%;}
+                        #$meta_box_id #editorcontainer{background:#fff !important;}
+                        #$meta_box_id #editor_id_fullscreen{display:none;}
+                </style>
+            
+                <script type='text/javascript'>
+                        jQuery(function($){
+                                $('#$meta_box_id #editor-toolbar > a').click(function(){
+                                        $('#$meta_box_id #editor-toolbar > a').removeClass('active');
+                                        $(this).addClass('active');
+                                });
+                                
+                                if($('#$meta_box_id #edButtonPreview').hasClass('active')){
+                                        $('#$meta_box_id #ed_toolbar').hide();
+                                }
+                                
+                                $('#$meta_box_id #edButtonPreview').click(function(){
+                                        $('#$meta_box_id #ed_toolbar').hide();
+                                });
+                                
+                                $('#$meta_box_id #edButtonHTML').click(function(){
+                                        $('#$meta_box_id #ed_toolbar').show();
+                                });
+
+    //Tell the uploader to insert content into the correct WYSIWYG editor
+    $('#media-buttons a').bind('click', function(){
+     var customEditor = $(this).parents('#$meta_box_id');
+     if(customEditor.length > 0){
+      edCanvas = document.getElementById('$editor_id');
+     }
+     else{
+      edCanvas = document.getElementById('content');
+     }
+    });
+                        });
+                </script>
+        ";
+        
+        //Create The Editor
+        $content = get_post_meta($post->ID, WYSIWYG_META_KEY, true);
+        the_editor($content, $editor_id);
+        
+        //Clear The Room!
+        echo "<div style='clear:both; display:block;'></div>";
+}
+
+add_action('save_post', 'wysiwyg_save_meta');
+function wysiwyg_save_meta(){
+ 
+        $editor_id = WYSIWYG_EDITOR_ID;
+        $meta_key = WYSIWYG_META_KEY;
+ 
+        if(isset($_REQUEST[$editor_id]))
+                update_post_meta($_REQUEST['post_ID'], WYSIWYG_META_KEY, $_REQUEST[$editor_id]);
+                
+}
+
+26) view port for responsive and mobile no
+-------------------------------------------------
+
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=0">
+<meta name="format-detection" content="telephone=no">
+
+
+27) avoid the plugin updation in a site
+------------------------------------------
+
+ /* plugin updation */
+ function filter_plugin_updates( $value ) {
+ unset( $value->response['woocommerce/woocommerce.php'] );
+ unset( $value->response['woocommerce-checkout-field-manager/sod-woocommerce-checkout-fields.php'] );
+    return $value;
+}
+add_filter( 'site_transient_update_plugins', 'filter_plugin_updates' );
+
+
+28)for get feature image from page
+===================================
+
+<?php if (has_post_thumbnail( $post->ID ) ): ?>
+  <?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' ); ?>
+  <div id="custom-bg" style="background-image: url('<?php echo $image[0]; ?>')">
+
+  </div>
+<?php endif; ?>
+
+
+29)both meta query and tax query in get posts
+================================================
+
+$valid_active_posts = get_posts(array('post_type' => 'stores', 'posts_per_page' => -1 ,'order' => 'ASC' ,'tax_query' => array( array( 'taxonomy' => $taxonomy_name, 'field' => 'term_id', 'terms' => $store_category->term_id)),'meta_query' => array( array( 'key' => 'active_section_check_box','value' => 'inactivestore', 'compare' => 'NOT LIKE' ))));
+
+30)get all kind of path
+========================
+https://codex.wordpress.org/Function_Reference/get_bloginfo
+
+31)wp-query parameters
+===================
+
+https://gist.github.com/luetkemj/2023628  (mainly used for filtration)
+
+32) woocommece addactions
+============================
+function product_custom_section()
+ {
+  global $post;
+  $product_id = $post->ID;
+  
+  $product_icon_file_select = get_post_meta( $product_id, 'product_icon_file_select', true );
+  if(isset($product_icon_file_select)){
+   if(($product_icon_file_select != 'no_energy_label') && ($product_icon_file_select != '')){
+    $exploded_classes = explode('|', $product_icon_file_select);
+    $product_icon_file_url = get_post_meta( $product_id, 'product_icon_file_url', true );
+    $product_sheet_url = get_post_meta( $product_id, 'product_offer', true );
+    $break_tech = '';
+    $for_font = '';
+    if(is_product()){
+     $break_tech = '<br />';
+     $for_font = 'font-control-custom';
+    }
+    echo ''.$break_tech.'<a class="custom-anchor '.$for_font.'" href="'.$product_sheet_url.'" target="_blank">Productkaart</a>&nbsp;&nbsp;&nbsp;';
+    echo '<a class="'.$exploded_classes[0].' '.$exploded_classes[1].' '.$for_font.'" href="'.$product_icon_file_url.'" target="_blank"></a>';
+   }
+  }
+ }
+add_action( 'woocommerce_after_shop_loop_item_title', 'product_custom_section' );// for shop page
+add_action( 'woocommerce_product_meta_end', 'product_custom_section' );//for single product 
+
+33)get_posts all parameters
+========================
+
+https://gist.github.com/luetkemj/2023628
