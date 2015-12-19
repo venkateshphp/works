@@ -1,0 +1,8 @@
+.content-carousel .owl-controls .owl-pagination, .image-slider .owl-controls .owl-pagination, .fullwidth-slider .owl-controls .owl-pagination, .item1-carousel .owl-controls .owl-pagination {
+    bottom: -15px;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
+}
