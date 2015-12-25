@@ -1,0 +1,34 @@
+/*************************************************************************************************************/
+---------------------This Is The Plug-in Used For The Management Of Shopping Portal Store----------------------
+/*************************************************************************************************************/
+
+1)Activate the plug-in, the plug-in files automatically created the following pages
+	A)Featured
+	B)Login
+	C)Member Information
+	D)Register
+	E)Shopping Portal Page
+	F)Favourites
+	
+If the pages are already there means, we leaved as it is as existing page
+(Note: We validating the pages whether it is there or not by its slug)
+
+2) Please Select the Following templates for the above Corresponding Pages
+	A)Featured------>(Template Name: Member-Shopping-Featured-Template)
+	B)Login------>(Template Name: Login-Template)
+	C)Member Information------>(Template Name: Member-Info-Template)
+	D)Register------>(Template Name: Register-Template)
+	E)Shopping Portal Page------>(Template Name: Member-Shopping-Featured-Template)
+	F)Favourites------>(Template Name: Member-Shopping-Favourites-Template)
+	
+3)Once the plug-in Activated, we created the Primary Menu if not available in your selected theme.So after that you should select the Primary Menu for your header menu 
+then we can add the My account, Login, Logout, Register automatically to your header menus.
+
+4)Please Add the Shopping Portal Page to Your Primary Menu in your Site
+
+5)Then We can Able to add the Login, Logout, Member Information, Register automatically by our plug-in Files
+
+/*************************************************************************************************************/
+--------------BE SURE TO CHECK THE PAGES AND MENUS WHILE USING THIS SHOPPING MANAGEMENT PLUG-IN----------------
+/*************************************************************************************************************/
+	
